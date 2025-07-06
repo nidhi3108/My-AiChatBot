@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 const Answers = ({ ans, key ,totalResult,type}) => {
   const [heading, setHeading] = useState(false);
 
-  function checkHeading(str: string) {
+  function checkHeading(str) {
     return /:$/.test(str);
   }
 

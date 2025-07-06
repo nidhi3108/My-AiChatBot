@@ -7,105 +7,31 @@ import AnimationLoader from './component/AnimationLoader';
 
 function App() {
   const [ques, setQues] = useState('');
-  type ResultItem = { type: string; text: string | string[] };
-  const [result, setResult] = useState<ResultItem[]>([]);
+
+  const [result, setResult] = useState([]);
   const [recentHitstory, setRecentHistory] = useState([]);
   const [selectedHistory, setSelectedHistory] = useState('');
   const [loading, setLoading] = useState(false);
 
   const storedHistory = localStorage.getItem('history');
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef(null);
 
   useEffect(() => {
     const history = storedHistory ? JSON.parse(storedHistory) : [];
     setRecentHistory(history);
   }, [storedHistory]);
 
-  // const askQues = async () => {
-  //   if (!ques && !selectedHistory) return;
-  //   console.log(ques, 'selectedHistory', selectedHistory);
-  //   const payload = {
-  //     contents: [
-  //       {
-  //         parts: [
-  //           {
-  //             text: ques ? ques : selectedHistory,
-  //           },
-  //         ],
-  //       },
-  //     ],
-  //   };
-  //   console.log('payload', payload);
-
-  //   const prevHistory = localStorage.getItem('history');
-
-  //   const prevHistoryArr: string[] = prevHistory ? JSON.parse(prevHistory) : [];
-  //   if (ques) {
-  //     if (prevHistoryArr.length > 0) {
-  //       localStorage.setItem(
-  //         'history',
-  //         JSON.stringify([...prevHistoryArr, ques])
-  //       );
-  //     } else {
-  //       localStorage.setItem('history', JSON.stringify([ques]));
-  //       setRecentHistory([ques]);
-  //     }
-  //   }
-  //   if (payload?.contents[0].parts[0].text === '') return;
-  //   const response = await fetch(url, {
-  //     method: 'POST',
-  //     body: JSON.stringify(payload),
-  //     headers: {
-  //       'content-type': 'application/json',
-  //     },
-  //   });
-
-  //   const data = await response.json();
-
-  //   const dataString = data?.candidates[0].content.parts[0].text.split('*');
-
-  //   const cleanData = dataString
-  //     .map((ele) => ele.trim())
-  //     .filter((ele) => ele !== '');
-
-  //   setResult([
-  //     ...result,
-  //     { type: 'q', text: ques ? ques : selectedHistory },
-  //     { type: 'a', text: cleanData },
-  //   ]);
-  //   setQues('');
-  //   setSelectedHistory('');
-
-  //   setTimeout(() => {
-  //     if (scrollRef.current) {
-  //       scrollRef.current.scrollTo({
-  //         top: scrollRef.current.scrollHeight,
-  //         behavior: 'smooth',
-  //       });
-  //     }
-  //   }, 100);
-  // };
-
-  // useEffect(() => {
-  //   if (selectedHistory) {
-  //     setQues(selectedHistory);
-  //     askQues();
-  //   }
-  // }, [selectedHistory]);
   const askQues = async () => {
     if (!ques && !selectedHistory) return;
 
     const questionText = ques ? ques : selectedHistory;
 
-    // ✅ Immediately show question
     setResult((prev) => [...prev, { type: 'q', text: questionText }]);
 
-    // ✅ Show loader
     setLoading(true);
 
-    // Handle history as before...
     const prevHistory = localStorage.getItem('history');
-    const prevHistoryArr: string[] = prevHistory ? JSON.parse(prevHistory) : [];
+    const prevHistoryArr = prevHistory ? JSON.parse(prevHistory) : [];
     if (ques) {
       const newHistory = [...prevHistoryArr, ques];
       localStorage.setItem('history', JSON.stringify(newHistory));
@@ -131,7 +57,6 @@ function App() {
       .map((ele) => ele.trim())
       .filter((ele) => ele !== '');
 
-    // ✅ Remove loader and add answer
     setResult((prev) => [...prev, { type: 'a', text: cleanData }]);
     setLoading(false);
     setQues('');
@@ -143,13 +68,13 @@ function App() {
     setRecentHistory([]);
   };
 
-  const isEnterPressed = (e: React.KeyboardEvent) => {
+  const isEnterPressed = (e) => {
     if (e.key === 'Enter') {
       e.preventDefault();
       askQues();
     }
   };
-  const handleHistoryClick = (history: string) => {
+  const handleHistoryClick = (history) => {
     console.log(history);
     setSelectedHistory(history);
     setQues(history);
@@ -170,7 +95,7 @@ function App() {
           <ul className="list-decimal text-white px-9 py-2">
             {Array.isArray(recentHitstory) &&
               recentHitstory.length > 0 &&
-              recentHitstory.map((history: string, ind: number) => (
+              recentHitstory.map((history, ind) => (
                 <li
                   key={ind + Math.random()}
                   className="text-left px-2 py-1 "
@@ -190,44 +115,6 @@ function App() {
               className="container h-2/3  text-white overflow-scroll px-32"
               ref={scrollRef}
             >
-              {/* <ul>
-                {result &&
-                  result.length > 0 &&
-                  result.map((ele, index) => (
-                    <div
-                      className={ele?.type === 'q' ? 'flex justify-end' : ''}
-                      key={index + Math.random()}
-                    >
-                      {ele?.type === 'q' ? (
-                        <li
-                          key={index + Math.random()}
-                          className="text-right border border-zinc-700 px-3 py-2 bg-zinc-700  w-fit rounded-br-4xl rounded-bl-4xl rounded-tl-4xl"
-                        >
-                          <Answers
-                            key={index}
-                            ans={ele?.text}
-                            totalResult={1}
-                            type={ele?.type}
-                          />
-                        </li>
-                      ) : (
-                        ele?.text?.map((textAns, textInd) => (
-                          <li
-                            key={textInd + Math.random()}
-                            className="text-left p-3 "
-                          >
-                            <Answers
-                              key={textInd}
-                              ans={textAns}
-                              totalResult={ele?.length}
-                              type={ele?.type}
-                            />
-                          </li>
-                        ))
-                      )}
-                    </div>
-                  ))}
-              </ul> */}
               <ul>
                 {result.map((ele, index) => (
                   <div
@@ -256,10 +143,9 @@ function App() {
                   </div>
                 ))}
 
-                {/* ✅ Loader when waiting for answer */}
                 {loading && (
                   <div className=" p-3 flex justify-start items-center">
-                 <AnimationLoader/>
+                    <AnimationLoader />
                   </div>
                 )}
               </ul>
