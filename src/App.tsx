@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import './App.css';
 import { url } from './constant';
 import Answers from './component/answers';
-import { Loader, Trash } from 'lucide-react';
+import { Trash } from 'lucide-react';
 import AnimationLoader from './component/AnimationLoader';
 
 function App() {
