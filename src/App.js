@@ -1,24 +1,18 @@
 import { useEffect, useRef, useState } from 'react';
-import type { KeyboardEvent } from 'react'; // ✅ type-only import
 import './App.css';
 import { url } from './constant';
 import Answers from './component/answers';
 import { Trash } from 'lucide-react';
 import AnimationLoader from './component/AnimationLoader';
 
-interface QAItem {
-  type: 'q' | 'a';
-  text: string | string[];
-}
-
 function App() {
-  const [ques, setQues] = useState<string>('');
-  const [result, setResult] = useState<QAItem[]>([]);
-  const [recentHistory, setRecentHistory] = useState<string[]>([]); // ✅ typo fixed
-  const [selectedHistory, setSelectedHistory] = useState<string>('');
-  const [loading, setLoading] = useState<boolean>(false);
+  const [ques, setQues] = useState('');
+  const [result, setResult] = useState([]);
+  const [recentHistory, setRecentHistory] = useState([]);
+  const [selectedHistory, setSelectedHistory] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef(null);
 
   useEffect(() => {
     const storedHistory = localStorage.getItem('history');
@@ -58,8 +52,8 @@ function App() {
       });
 
       const data = await response.json();
-      const dataString = data?.candidates[0].content.parts[0].text.split('*') ?? [];
-      const cleanData = dataString.map((ele: string) => ele.trim()).filter((ele: string) => ele !== '');
+      const dataString = data?.candidates[0]?.content?.parts[0]?.text?.split('*') ?? [];
+      const cleanData = dataString.map((ele) => ele.trim()).filter((ele) => ele !== '');
 
       setResult((prev) => [...prev, { type: 'a', text: cleanData }]);
     } catch (err) {
@@ -76,14 +70,14 @@ function App() {
     setRecentHistory([]);
   };
 
-  const isEnterPressed = (e: KeyboardEvent<HTMLInputElement>) => {
+  const isEnterPressed = (e) => {
     if (e.key === 'Enter') {
       e.preventDefault();
       askQues();
     }
   };
 
-  const handleHistoryClick = (history: string) => {
+  const handleHistoryClick = (history) => {
     setSelectedHistory(history);
     setQues(history);
     askQues();
@@ -108,6 +102,7 @@ function App() {
           ))}
         </ul>
       </div>
+
       <div className="col-span-4 bg-zinc-800 flex flex-col justify-center items-center gap-6 h-screen">
         <header className="text-2xl p-6 bg-gradient-to-l from-blue-600 via-green-500 to-indigo-400 bg-clip-text text-transparent font-medium">
           Ask anything from me
@@ -123,10 +118,10 @@ function App() {
                 >
                   {ele?.type === 'q' ? (
                     <li className="text-right">
-                      <Answers ans={ele.text as string} totalResult={1} type={ele.type} />
+                      <Answers ans={ele.text} totalResult={1} type={ele.type} />
                     </li>
                   ) : (
-                    (ele.text as string[]).map((textAns, textInd) => (
+                    ele.text.map((textAns, textInd) => (
                       <li key={`${index}-${textInd}`} className="text-left p-3">
                         <Answers ans={textAns} totalResult={1} type={ele.type} />
                       </li>

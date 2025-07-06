@@ -1,24 +1,17 @@
 import { useEffect, useState } from 'react';
 
-interface AnswersProps {
-  ans: string;
-  index: number;
-  totalResult: number;
-  type: 'q' | 'a';
-}
-
-const Answers: React.FC<AnswersProps> = ({ ans, index, totalResult, type }) => {
+const Answers = ({ ans, index, totalResult, type }) => {
   const [heading, setHeading] = useState(false);
 
-  function checkHeading(str: string): boolean {
+  function checkHeading(str) {
     return /:$/.test(str);
   }
 
-  function replaceEndingColonWithEmoji(str: string): string {
+  function replaceEndingColonWithEmoji(str) {
     return str.replace(/:$/, '🚀');
   }
 
-  function replaceEndingColon(str: string): string {
+  function replaceEndingColon(str) {
     return str.replace(/:$/, '!');
   }
 
