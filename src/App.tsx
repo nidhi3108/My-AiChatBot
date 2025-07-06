@@ -1,5 +1,5 @@
-// Converted your JavaScript-based React App component to TypeScript
-import { useEffect, useRef, useState, KeyboardEvent } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import type { KeyboardEvent } from 'react'; // ✅ type-only import
 import './App.css';
 import { url } from './constant';
 import Answers from './component/answers';
@@ -14,7 +14,7 @@ interface QAItem {
 function App() {
   const [ques, setQues] = useState<string>('');
   const [result, setResult] = useState<QAItem[]>([]);
-  const [recentHitstory, setRecentHistory] = useState<string[]>([]);
+  const [recentHistory, setRecentHistory] = useState<string[]>([]); // ✅ typo fixed
   const [selectedHistory, setSelectedHistory] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -58,7 +58,7 @@ function App() {
       });
 
       const data = await response.json();
-      const dataString = data?.candidates[0].content.parts[0].text.split('*');
+      const dataString = data?.candidates[0].content.parts[0].text.split('*') ?? [];
       const cleanData = dataString.map((ele: string) => ele.trim()).filter((ele: string) => ele !== '');
 
       setResult((prev) => [...prev, { type: 'a', text: cleanData }]);
@@ -97,7 +97,7 @@ function App() {
           <Trash className="w-6 h-6 text-red-500" onClick={clearHistory} />
         </div>
         <ul className="list-decimal text-white px-9 py-2">
-          {recentHitstory.map((history, ind) => (
+          {recentHistory.map((history, ind) => (
             <li
               key={ind}
               className="text-left px-2 py-1"
@@ -127,7 +127,7 @@ function App() {
                     </li>
                   ) : (
                     (ele.text as string[]).map((textAns, textInd) => (
-                      <li key={textInd} className="text-left p-3">
+                      <li key={`${index}-${textInd}`} className="text-left p-3">
                         <Answers ans={textAns} totalResult={1} type={ele.type} />
                       </li>
                     ))
